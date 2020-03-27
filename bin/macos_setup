@@ -15,7 +15,8 @@ EOS
             echo "$(tput setaf 2)----- MacOS setup... ⭐︎彡 -----$(tput sgr0)"
         ;; 
         *)
-            echo "$(tput setaf 1)----- This script is intended for OSX users... -----$(tput sgr0)"
+            echo "$(tput setaf 1)----- This script is intended for macOSX users... -----$(tput sgr0)"
+            exit 0
         ;; 
     esac
 

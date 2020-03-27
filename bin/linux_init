@@ -1,6 +1,22 @@
 #!/bin/bash
 run_linux_init() {
+
+echo "$(tput setaf 2)----- LinuxOS Initialize ... ⭐︎彡 -----$(tput sgr0)"
+
+# 管理者パスワードを事前に要求する
+sudo -v
+
 # For Ubuntu & Xubuntu(Voyager)
+
+
+
+
+
+
+
+
+
+
 
 # -------------------------------------------------------------
 # Linuxbrewを使う場合

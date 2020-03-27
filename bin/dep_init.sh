@@ -15,10 +15,15 @@
 #      ├── mac
 #      └── linux           
 #   -->Homebrewが入ってない時にHomebrew本体、brewbundleによるインストール、その他による初期状態構築
+# 4. MacOS system settings (defaults write...他) 
+#   sh ~/dotfiles/dot_init/dep_init.sh macset
+# 5. LinuxOS system settings (sudo apt...他) 
+#   sh ~/dotfiles/dot_init/dep_init.sh linuxset
+# 6. Update & Upgrade (brew,apt他) 
+#   sh ~/dotfiles/dot_init/dep_init.sh update
 #
 
 set -e
-#OS="$(uname -s)"
 DOTPATH="${HOME}/dotfiles"
 DOT_TARBALL="https://github.com/himebell5/dotfiles/tarball/master"
 REMOTE_URL="git@github.com:himebell5/dotfiles.git"
@@ -50,10 +55,14 @@ $(tput setaf 4)Usage:$(tput sgr0)
 $(tput setaf 4)Commands:$(tput sgr0)
   $(tput setaf 6)download $(tput sgr0)      :download dotfiles in $(tput setaf 3)${HOME}$(tput sgr0)
   $(tput setaf 6)deploy $(tput sgr0)        :symlink dotfiles to $(tput setaf 3)${HOME}$(tput sgr0)
-  $(tput setaf 6)initialize $(tput sgr0)    :settings for homebrew,applications,apt and etc 
- 
+  $(tput setaf 6)initialize $(tput sgr0)    :install for homebrew,applications,apt and etc
+  $(tput setaf 6)macset $(tput sgr0)        :defaults write...MacOS system settings  
+  $(tput setaf 6)linuxset $(tput sgr0)      :sudo...LinuxOS system settings 
+  $(tput setaf 6)update $(tput sgr0)        :update for homebrew,applications,apt and etc 
+
   * Please login to the $(tput setaf 3)AppStore$(tput sgr0) as preparation (For macOS initialize).
   * Please put the formatted $(tput setaf 3)Brewfile$(tput sgr0) in $(tput setaf 3)${HOME}$(tput sgr0) as preparation (For initialize).
+  * Ctrl-C to interrupt this script...
   
 EOF
   exit 0
@@ -180,9 +189,9 @@ source "${DOTINIT}/linux_init"
 initialize() {
   case ${OSTYPE} in
     darwin*)
-        "run_mac" ;;
+        "run_mac_init" ;;
     linux-gnu*)
-        "run_linux" ;;    	    
+        "run_linux_init" ;;    	    
     *)
         echo "$(tput setaf 1)----- Working only OSX / Linux(Ubuntu)... -----$(tput sgr0)" && exit 1 ;;
   esac
@@ -190,10 +199,29 @@ initialize() {
 }
 fi
 
+cd "${DOTINIT}"
+source "${DOTINIT}/macos_setup"
+source "${DOTINIT}/linuxos_setup"
+source "${DOTINIT}/update"
+
+# 4. macOSのdefaults write...ほにゃららのsystem settings 
+macset() {
+	"run_macos_setup" 
+}
+
+# 5. linuxOSのsudo apt...ほにゃららのsystem settings
+linuxset() {
+	"run_linuxos_setup" 
+}
+
+# 6. あまり使わないと思うけど一気にupdate & upgrade
+update() {
+	"run_update"
+}
+
 # 引数によって場合分け
 command=$1
 [ $# -gt 0 ] && shift
-
 # 引数がなければヘルプ
 case $command in
   down*)
@@ -204,6 +232,15 @@ case $command in
     ;;
   init*)
     initialize
+    ;;
+  mac*)
+    macset
+    ;;
+  linu*)
+    linuxset
+    ;;
+  upd*)
+    update
     ;;
   *)
     usage

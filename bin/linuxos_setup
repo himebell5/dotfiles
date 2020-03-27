@@ -16,6 +16,7 @@ EOS
         ;; 
         *)
             echo "$(tput setaf 1)----- This script is intended for Linux users... -----$(tput sgr0)"
+            exit 0
         ;; 
     esac
     
@@ -25,7 +26,7 @@ osascript -e 'tell application "System Preferences" to quit'
 # 管理者パスワードを事前に要求する
 sudo -v
 
-# Keep-alive:.macosが終了するまで、既存のsudoタイムスタンプを更新する
+# Keep-alive:.osが終了するまで、既存のsudoタイムスタンプを更新する
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 ########################################################################

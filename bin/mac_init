@@ -1,9 +1,15 @@
 #!/bin/bash
 run_mac_init() {
 
+echo "$(tput setaf 2)----- MacOS Initialize ... ⭐︎彡 -----$(tput sgr0)"
+
+# 管理者パスワードを事前に要求する
+sudo -v
+
 # 1. Homebrew本体のインストール
 #   CommandlineToolのinstallも含まれているはず
 #   xcode-select --install
+
   if has "brew"; then
     echo "$(tput setaf 2)----- Homebrew already successfully installed ✔︎  -----$(tput sgr0)"
   else

@@ -18,10 +18,16 @@ $ sh "{Somewhere}/dep_init.sh" download
 $ chmod -x "{Somewhere}/dep_init.sh" && "{Somewhere}/dep_init.sh" download
 ```
 
-OS setup: defaults write.../sudo
+macOS setup: defaults write...
 
 ```	
-$ sh ${HOME}/dotfiles/bin/os_setup.sh
+$ sh ${HOME}/dotfiles/bin/dep_init.sh macset
+```
+
+linuxOS setup: sudo...
+
+```	
+$ sh ${HOME}/dotfiles/bin/dep_init.sh linuxset
 ```
 
 Deploy: dotfailes deploy (symlink to home dir)
@@ -30,7 +36,7 @@ Deploy: dotfailes deploy (symlink to home dir)
 $ sh ${HOME}/dotfiles/bin/dep_init.sh deploy
 ```
 
-Initialize: Homebrew & Application etc install/ apt-get or Linuxbrew?
+Initialize: Homebrew & Application etc install/ apt-get or Linuxbrew
 
 ```
 $ sh ${HOME}/dotfiles/bin/dep_init.sh initialize
@@ -38,7 +44,7 @@ $ sh ${HOME}/dotfiles/bin/dep_init.sh initialize
 Update apps and settings:
 
 ```
-$ sh ${HOME}/dotfiles/bin/os_setup.sh
+$ sh ${HOME}/dotfiles/bin/dep_init.sh update
 ```
 
 vim plugin install:

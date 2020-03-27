@@ -12,6 +12,9 @@ EOS
 
 echo "$(tput setaf 2)----- Update & Upgrade ... ⭐︎彡 -----$(tput sgr0)"
 
+# 管理者パスワードを事前に要求する
+sudo -v
+
 # ---------- git repository update
 #if has "git"; then
 #DOTPATH="${HOME}/dotfiles"
