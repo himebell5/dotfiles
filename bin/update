@@ -1,0 +1,54 @@
+#!/bin/bash
+run_update() {
+
+cat << EOS
+
+$(tput setaf 5)* $USER *$(tput sgr0)
+
+ The elapsed time does not matter.
+ Because speed is important.
+
+EOS
+
+echo "$(tput setaf 2)----- Update & Upgrade ... ⭐︎彡 -----$(tput sgr0)"
+
+# ---------- git repository update
+#if has "git"; then
+#DOTPATH="${HOME}/dotfiles"
+#cd ${DOTPATH}
+#git checkout master
+#git pull origin master
+#fi
+
+# ---------- Homebrew update and upgrade
+if has "brew"; then
+brew update
+brew upgrade
+brew doctor
+fi
+
+# ---------- Homebrew cask app upgrade
+if has "brew cask"; then
+cask upgrade
+fi
+
+# ---------- App Store app upgrade
+if has "mas"; then
+mas upgrade
+fi
+
+# ---------- Homebrew cleanup
+if has "brew"; then
+brew cleanup
+fi
+
+# ---------- apt update and upgrade
+if has "apt"; then
+apt update
+apt upgrade
+fi
+
+echo "$(tput setaf 2)----- Update complete! ✔︎ ⭐︎彡 -----$(tput sgr0)"
+
+# ===========================================================
+}

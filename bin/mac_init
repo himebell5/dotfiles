@@ -1,0 +1,134 @@
+#!/bin/bash
+run_mac_init() {
+
+# 1. Homebrew本体のインストール
+#   CommandlineToolのinstallも含まれているはず
+#   xcode-select --install
+  if has "brew"; then
+    echo "$(tput setaf 2)----- Homebrew already successfully installed ✔︎  -----$(tput sgr0)"
+  else
+    echo "$(tput setaf 2)----- Installing Homebrew... -----$(tput sgr0)"
+    which brew >/dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    echo "$(tput setaf 2)----- run brew doctor... -----$(tput sgr0)"
+    which brew >/dev/null 2>&1 && brew doctor
+    echo "$(tput setaf 2)----- run brew update... -----$(tput sgr0)"
+    which brew >/dev/null 2>&1 && brew update
+    echo "$(tput setaf 2)----- ok. run brew upgrade... -----$(tput sgr0)"
+        brew upgrade --all
+    echo "$(tput setaf 2)----- Installed Homebrew complete ✔︎  -----$(tput sgr0)"
+  fi
+
+# 2. rbenvのインストール
+#   依存でrubyが別に入ってしまうのを防ぐため先に入れる
+#   narou.rbのためだけの設定なので使わなければ削除
+    echo "$(tput setaf 2)----- Set up rbenv... -----$(tput sgr0)"
+    if [ ! -d "${HOME}/.rbenv" ] ; then
+     brew install rbenv ruby-build
+    fi
+# 指定のgemだけinstallするrbenv-default-gemsがなかったら、.rbenv/pluginにgitcloneして入れる、dotilesからdefault-gemsをsymlinkしてくる。
+    if has "rbenv"; then
+    [ ! -d "$(rbenv root)/plugins/rbenv-default-gems" ] && git clone -q https://github.com/rbenv/rbenv-default-gems.git "$(rbenv root)/plugins/rbenv-default-gems"
+    [ ! -e "$(rbenv root)/default-gems" ] && ln -snfv "${DOTPATH}/lib/default-gems" "$(rbenv root)/default-gems"
+    fi    
+# 最新のRubyを入れる
+    LATEST="$(rbenv install --list | grep -v - | tail -n 1)"
+    CURRENT="$(rbenv versions | tail -n 1 | cut -d' ' -f 2)"
+    if has "rbenv"; then
+      if [ "${CURRENT}" != "${LATEST}" ]; then
+        rbenv install "${LATEST}"
+        rbenv global  "${LATEST}"
+      fi
+    fi
+    echo "$(tput setaf 2)----- Ruby set up complete ✔︎  -----$(tput sgr0)"
+
+# 3. Brewfileからのインストール
+#   command(CUI commands)
+# 	cask(GUI apps, QuickLook plugins, fonts)
+# 	mas(AppStore app) 事前にAppStoreにログインしておいた方が良かったはず。
+#   事前に旧Brewfileの内容を吟味して、いらないものや既に入ってるものを削除し、整形しておく。
+#   ${HOME}にBrewfileを置いてあることをトリガーにしてる。
+  if has "brew" && [ -e "${HOME}/Brewfile" ] ; then     
+    echo "$(tput setaf 2)----- Installing missing formulae... -----$(tput sgr0)"
+      brew bundle
+  fi
+  echo "$(tput setaf 2)----- Installed missing formulae complete ✔︎  -----$(tput sgr0)"
+
+# 4. その他もろもろのSetting
+  echo "$(tput setaf 2)----- Other set up... -----$(tput sgr0)"
+
+# 起動シェルをzshにする    
+    echo "$(tput setaf 2)----- Set up Zsh... -----$(tput sgr0)"
+    if [ ! "${SHELL}" = "/usr/local/bin/zsh"  ] ; then
+    sh -c "echo '/usr/local/bin/zsh' >> /etc/shells"
+    chsh -s /usr/local/bin/zsh
+    fi
+# zinitをpluginマネージャーとして使用
+    if [ ! -d "${ZDOTDIR}/.zinit" ] ; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zinit/master/doc/install.sh)"
+    fi
+    
+# vim-plugをpluginマネージャーとして使用    
+    echo "$(tput setaf 2)----- Set up Vim... -----$(tput sgr0)"
+    if [ ! -d "${HOME}/.vim/autoload/" ] ; then
+    sh -c "$(curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim)"
+    mkdir -p ~/.vim/plugged
+    fi
+
+# Brewで入らなかったQuickLookpluginを入れる
+    echo "$(tput setaf 2)----- Set up QuickLook_Plugin... -----$(tput sgr0)"
+        QUICKLOOK="${HOME}/Library/QuickLook"
+        cd "${QUICKLOOK}"
+    # HetimaZip。BetterZipと迷ったが、有料への導きがあるそうなのでこっちに。
+    if [ ! -e "${QUICKLOOK}/HetimaZip.qlgenerator" ] ; then
+        curl -OL https://github.com/hetima/HetimaZip-qlgenerator/releases/download/v1.0/HetimaZip.qlgenerator1.0.zip
+        unzip HetimaZip.qlgenerator1.0.zip
+        mv HetimaZip.qlgenerator1.0/HetimaZip.qlgenerator ~/Library/QuickLook/HetimaZip.qlgenerator
+        rm -rf HetimaZip.qlgenerator1.0.zip HetimaZip.qlgenerator1.0
+        qlmanage -r
+    fi
+    # qltext-jp。日本語文字化けのために。
+    if [ ! -e "${QUICKLOOK}/qltext-jp.qlgenerator" ] ; then 
+        curl -OL https://github.com/mzp/qltext-jp/releases/download/1.0.0/qltext-jp-1.0.0.zip
+        unzip qltext-jp-1.0.0.zip
+        rm -rf qltext-jp-1.0.0.zip
+        qlmanage -r
+    fi    
+    
+    echo "$(tput setaf 2)----- Other set up complete ✔︎  -----$(tput sgr0)"
+}
+
+#------------------------
+#libraofficeについて
+#------------------------
+#libreofficeのはじめのインストールはランゲージパックのみで依存で本体もインストールされる。
+#バージョンアップはbrew cask reinstall libreoffice libreoffice-language-packで (英語に一時的に戻って)からランゲージパックで日本語にする。
+
+#------------------------
+#別途入れるかもしれないもの
+#------------------------
+#EasyWine.app
+#1Piece.app
+#[ダウンロード - Mac用の多機能アプリケーション 1Piece](https://app1piece.com/ja/download/)
+
+#------------------------
+#とりあえず見送ったもの
+#------------------------
+#1176895641 Spark(1.5.9)
+#1091189122 Bear.app
+#495511246 CLCL Lite
+#1055511498 Day One.app
+#500154009 BitdefenderVirusScanner.app
+#412448059 ForkLift.app
+#461369673 VOX.app
+#884952790 iTranslate.app
+#brew cask install boostnote
+#brew cask install libreoffice-language-pack --language=ja
+#brew cask install FireAlpaca.app
+#brew cask install spotify
+#brew cask install avast-security
+#brew cask install "murus"
+#brew cask install "day-o"
+#brew cask install "xquartz"
+#mas install "com.apple.iWork.Keynote", id: 409183694 たぶん入れられない
+#mas install "com.apple.iWork.Pages", id: 409201541 たぶん入れられない

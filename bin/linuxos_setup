@@ -1,0 +1,58 @@
+#!/bin/bash
+run_linuxos_setup() {
+
+cat << EOS
+
+$(tput setaf 5)* $USER *$(tput sgr0)
+
+ The elapsed time does not matter.
+ Because speed is important.
+
+EOS
+
+    case ${OSTYPE} in
+        linux*)
+            echo "$(tput setaf 2)----- LinuxOS setup... ⭐︎彡 -----$(tput sgr0)"
+        ;; 
+        *)
+            echo "$(tput setaf 1)----- This script is intended for Linux users... -----$(tput sgr0)"
+        ;; 
+    esac
+    
+# 開いている[システム環境設定]ペインをすべて閉じて、変更しようとしている設定を上書きされないように
+osascript -e 'tell application "System Preferences" to quit'
+
+# 管理者パスワードを事前に要求する
+sudo -v
+
+# Keep-alive:.macosが終了するまで、既存のsudoタイムスタンプを更新する
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+########################################################################
+# General UI/UX                                                               ########################################################################
+
+# hostname の設定
+#sudo hostnamectl set-hostname <hostname>
+
+# パッケージリストの更新
+sudo apt-get update
+
+# インストールされてるパッケージの更新
+sudo apt-get upgrade
+
+# パッケージ自動アップデートインストール&適用
+sudo apt-get install unattended-upgrades
+
+# 『デスクトップ』『音楽』などの日本語フォルダー名を英語表記にする
+env LANGUAGE=C LC_MESSAGES=C xdg-user-dirs-gtk-update
+
+# デスクトップがフリーズした場合に備えて「Ctrl+Alt+Backspace」で強制終了を有効化
+# sudo dpkg-reconfigure keyboard-configuration
+
+# updatedbの無効化(locateコマンド使わないならしておく)
+sudo chmod 644 /etc/cron.daily/mlocate
+#もとに戻すならsudo chmod 755 /etc/cron.daily/mlocate
+
+
+# ===========================================================
+}

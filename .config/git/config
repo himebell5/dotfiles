@@ -1,0 +1,79 @@
+# ===========================================================
+# ――*―― .giticonfig――*――
+# ===========================================================
+
+[user]
+    name        = himebell5
+    email       = 34831967+himebell5@users.noreply.github.com.
+[url "git@github.com:"]
+    InsteadOf   = https://github.com/
+[include]
+    path        = .gitconfig.user
+[core]
+    editor      = vim
+	quotepath   = false
+	autocrlf    = false
+    ignorecase  = false
+[color]
+    ui          = true
+    status      = auto
+    grep        = auto
+    interactive = auto
+[color "diff"]
+    meta        = 242 238
+    frag        = 239 236
+    old         = 167 normal
+    new         = 030 normal
+    context     = 240
+    commit      = 246 024
+[color "branch"]
+    branch      = auto
+    current     = yellow reverse
+    local       = yellow
+    remote      = green
+[help]
+    autocorrect = 1
+[push]
+	default     = matching
+[interactive]
+    diffFilter  = diff-highlight
+[pager]
+    log         = diff-highlight | less -RX
+    show        = diff-highlight | less -RX
+    diff        = diff-highlight | less -RX
+[diff]
+    tool                = vimdiff
+    algorithm           = histogram
+    compactionHeuristic = true
+[difftool]
+	prompt      = false
+[merge]
+	tool        = vimdiff
+[mergetool]
+	prompt      = false
+[branch]
+    autosetupmerge = true
+[filter "lfs"]
+    clean       = git-lfs clean %f
+    smudge      = git-lfs smudge %f
+    required    = true
+[http]
+    postBuffer  = 100M
+[format]
+    pretty      = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
+[alias]
+    st          = status
+    co          = checkout
+    cm          = commit --verbose
+    df          = diff
+    br          = switch
+    ps          = !git push origin `git rev-parse --abbrev-ref HEAD`
+    pl          = !git pull origin `git rev-parse --abbrev-ref HEAD`
+    typechange  = status -s | awk '$1=="T"{print $2}' | xargs git checkout
+    graph       = log --graph --date-order --all --pretty=format:'%h %Cred%d %Cgreen%ad %Cblue%cn %Creset%s' --date=short
+    review      = diff origin/master...
+    review-files = diff origin/master... --name-only
+    lg         = log --color=always --max-count=10 --oneline origin/master...
+    delete-merged-branches = !git branch --merged | grep -v \\* | xargs -I % git branch -d %
+    type        = cat-file -t
+    dump        = cat-file -p
